@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScourgeTiers Network</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Signika+Negative:wght@400;600;700&display=swap');
+        :root {
+            --bg-darker: #0d0e11;
+            --bg-card: #15171e;
+            --bg-hover: #1e212b;
+            --accent: #554fff;
+            --text-main: #f5f6f9;
+            --text-muted: #949ba4;
+            --border-color: #242734;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-darker); color: var(--text-main); font-family: 'Signika Negative', sans-serif; padding: 40px 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 40px; }
+        header h1 { font-size: 3rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; background: linear-gradient(135deg, #ff4757 0%, #554fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+        header p { color: var(--text-muted); font-size: 1.1rem; }
+        .kit-selector { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 35px; background: var(--bg-card); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .kit-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 18px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 1.05rem; font-weight: 600; transition: all 0.2s ease; }
+        .kit-btn img { width: 24px; height: 24px; image-rendering: pixelated; object-fit: contain; }
+        .kit-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .kit-btn.active { background: var(--accent); color: #ffffff; border-color: #7671ff; box-shadow: 0 4px 12px rgba(85, 79, 255, 0.3); }
+        .tier-section { display: flex; flex-direction: column; gap: 12px; }
+        .tier-row { display: flex; background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; }
+        .tier-badge { width: 90px; min-width: 90px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; color: #fff; }
+        .tier-s-plus { background-color: #ff3838; } .tier-s { background-color: #ff4d4d; } .tier-s-minus { background-color: #ff6e6e; }
+        .tier-a-plus { background-color: #ffaf40; } .tier-a { background-color: #ffc048; } .tier-a-minus { background-color: #ffd32a; }
+        .tier-b-plus { background-color: #05c46b; } .tier-b { background-color: #0be881; } .tier-b-minus { background-color: #34e7e4; }
+        .tier-c-plus { background-color: #3c40c6; } .tier-c { background-color: #5758bb; } .tier-c-minus { background-color: #bc5a45; }
+        .tier-d-plus { background-color: #808e9b; } .tier-d { background-color: #485460; } .tier-d-minus { background-color: #1e272e; }
+        .tier-f-plus { background-color: #2c2c54; color: #aaa; } .tier-f { background-color: #1b1b3a; color: #888; } .tier-f-minus { background-color: #111122; color: #666; }
+        .player-list { display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; align-items: center; width: 100%; }
+        .player-card { background: var(--bg-hover); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 6px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; transition: transform 0.15s ease; }
+        .player-card:hover { transform: translateY(-2px); border-color: var(--text-muted); }
+        .player-avatar { width: 20px; height: 20px; border-radius: 3px; }
+        .no-players { color: var(--text-muted); font-style: italic; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>SCOURGETIERS</h1>
+        <p>Official Player Rankings for ScourgePvP Kits</p>
+    </header>
+    <div class="kit-selector">
+        <button class="kit-btn active" onclick="switchKit('sword')"><img src="https://assets.minecraftservices.com/content/dam/minecraft/items/diamond_sword.png" alt="Sword"> Sword</button>
+        <button class="kit-btn" onclick="switchKit('axe')"><img src="https://assets.minecraftservices.com/content/dam/minecraft/items/diamond_axe.png" alt="Axe"> Axe</button>
+        <button class="kit-btn" onclick="switchKit('mace')"><img src="https://assets.minecraftservices.com/content/dam/minecraft/items/mace.png" alt="Mace"> Mace</button>
+        <button class="kit-btn" onclick="switchKit('spearmace')"><img src="https://assets.minecraftservices.com/content/dam/minecraft/items/trident.png" alt="Spearmace" style="filter: hue-rotate(140deg) brightness(0.6);"> Spearmace</button>
+        <button class="kit-btn" onclick="switchKit('cart')"><img src="https://assets.minecraftservices.com/content/dam/minecraft/items/tnt_minecart.png" alt="Cart"> Cart</button>
+        <button class="kit-btn" onclick="switchKit('diasmp')"><img src="https://assets.minecraftservices.com/content/dam/minecraft/items/diamond_helmet.png" alt="DiaSMP"> DiaSMP</button>
+        <button class="kit-btn" onclick="switchKit('smp')"><img src="https://assets.minecraftservices.com/content/dam/minecraft/items/netherite_chestplate.png" alt="SMP"> SMP</button>
+    </div>
+    <div class="tier-section" id="leaderboard-container"></div>
+</div>
+<script>
+    const globalRoster = {
+        sword: { "S+": ["Minemanner"], "S": ["Doly"], "A+": ["TryHard"], "F-": ["Slone"] },
+        axe: { "S": ["ClownPierce"], "C+": ["PlayerOne"] },
+        mace: { "S+": ["HammerTime"] },
+        spearmace: { "A+": ["LancerPvP"] },
+        cart: { "S": ["TntDrop"] },
+        diasmp: { "S+": ["DiamondGod"] },
+        smp: { "A": ["VanillaGuy"] }
+    };
+    const orderedTiers = [
+        { id: "S+", class: "tier-s-plus" }, { id: "S", class: "tier-s" }, { id: "S-", class: "tier-s-minus" },
+        { id: "A+", class: "tier-a-plus" }, { id: "A", class: "tier-a" }, { id: "A-", class: "tier-a-minus" },
+        { id: "B+", class: "tier-b-plus" }, { id: "B", class: "tier-b" }, { id: "B-", class: "tier-b-minus" },
+        { id: "C+", class: "tier-c-plus" }, { id: "C", class: "tier-c" }, { id: "C-", class: "tier-c-minus" },
+        { id: "D+", class: "tier-d-plus" }, { id: "D", class: "tier-d" }, { id: "D-", class: "tier-d-minus" },
+        { id: "F+", class: "tier-f-plus" }, { id: "F", class: "tier-f" }, { id: "F-", class: "tier-f-minus" }
+    ];
+    function renderLeaderboard(kitName) {
+        const container = document.getElementById('leaderboard-container');
+        container.innerHTML = ''; 
+        const activeKitData = globalRoster[kitName] || {};
+        orderedTiers.forEach(tierObj => {
+            const players = activeKitData[tierObj.id] || [];
+            const row = document.createElement('div');
+            row.className = 'tier-row';
+            const badge = document.createElement('div');
+            badge.className = `tier-badge ${tierObj.class}`;
+            badge.innerText = tierObj.id;
+            const list = document.createElement('div');
+            list.className = 'player-list';
+            if (players.length > 0) {
+                players.forEach(playerName => {
+                    const card = document.createElement('div');
+                    card.className = 'player-card';
+                    card.innerHTML = `<img class="player-avatar" src="https://mc-heads.net/avatar/${playerName}/20"><span>${playerName}</span>`;
+                    list.appendChild(card);
+                });
+            } else {
+                list.innerHTML = '<span class="no-players">-</span>';
+            }
+            row.appendChild(badge);
+            row.appendChild(list);
+            container.appendChild(row);
+        });
+    }
+    function switchKit(kitName) {
+        document.querySelectorAll('.kit-btn').forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        renderLeaderboard(kitName);
+    }
+    renderLeaderboard('sword');
+</script>
+</body>
+</html>
